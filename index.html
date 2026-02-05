@@ -3,254 +3,1117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Care Clinic | Book Appointment</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>MedCare Clinic - Book Your Appointment</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        clinic: {
-                            blue: '#0056b3',    /* Deep Blue like Image 2 */
-                            light: '#e6f2ff',   /* Light Blue Background */
-                            accent: '#007bff',  /* Brighter Blue */
-                            gold: '#d4af37',    /* Gold Accent */
-                            goldhover: '#b5952f'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Poppins', 'sans-serif'],
-                    },
-                    animation: {
-                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
-                    },
-                    keyframes: {
-                        fadeInUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Custom Background handling for blur */
-        .bg-clinic {
-            background-image: url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2053&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #1a5fb4;
+            --light-blue: #e8f4fc;
+            --sky-blue: #62a0ea;
+            --gold: #c9a227;
+            --gold-light: #f4e4a6;
+            --white: #ffffff;
+            --text-dark: #1a1a2e;
+            --text-gray: #5a5a6e;
+            --shadow: rgba(26, 95, 180, 0.15);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background with blur effect */
+        .background-container {
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
+            width: 100%;
+            height: 100%;
             z-index: -1;
-            filter: blur(8px);
-            transform: scale(1.1); /* Prevents blur edges from showing */
-        }
-        
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-top: 4px solid #d4af37; /* Gold border top */
+            overflow: hidden;
         }
 
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
+        .background-image {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(26, 95, 180, 0.85) 0%, rgba(98, 160, 234, 0.75) 100%),
+                        url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
+            background-size: cover;
+            background-position: center;
+            filter: blur(3px);
+            transform: scale(1.05);
+            animation: bgPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes bgPulse {
+            0%, 100% { transform: scale(1.05); }
+            50% { transform: scale(1.08); }
+        }
+
+        /* Floating particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
             width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 15s infinite;
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+
+        .particle:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 12s; }
+        .particle:nth-child(2) { left: 20%; animation-delay: 2s; animation-duration: 15s; width: 12px; height: 12px; }
+        .particle:nth-child(3) { left: 35%; animation-delay: 4s; animation-duration: 18s; }
+        .particle:nth-child(4) { left: 50%; animation-delay: 1s; animation-duration: 14s; width: 6px; height: 6px; }
+        .particle:nth-child(5) { left: 65%; animation-delay: 3s; animation-duration: 16s; }
+        .particle:nth-child(6) { left: 80%; animation-delay: 5s; animation-duration: 13s; width: 10px; height: 10px; }
+        .particle:nth-child(7) { left: 90%; animation-delay: 2.5s; animation-duration: 17s; }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
         }
-        ::-webkit-scrollbar-thumb {
-            background: #0056b3;
-            border-radius: 4px;
+
+        /* Main container */
+        .main-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: var(--white);
+            box-shadow: 0 8px 32px rgba(201, 162, 39, 0.4);
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 8px 32px rgba(201, 162, 39, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 12px 40px rgba(201, 162, 39, 0.6); }
+        }
+
+        .logo-text {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--white);
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo-text span {
+            color: var(--gold);
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        /* Form card */
+        .form-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 50px;
+            width: 100%;
+            max-width: 700px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.2), 
+                        0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+            animation: fadeInUp 1s ease-out 0.3s both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--sky-blue), var(--gold), var(--sky-blue), var(--primary-blue));
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-title {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .form-title h2 {
+            font-size: 1.8rem;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-title p {
+            color: var(--text-gray);
+            font-size: 0.95rem;
+        }
+
+        .form-title .gold-line {
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold), var(--gold-light));
+            margin: 15px auto 0;
+            border-radius: 2px;
+        }
+
+        /* Form grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .form-group:focus-within label {
+            color: var(--primary-blue);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--sky-blue);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group:focus-within .input-wrapper i {
+            color: var(--primary-blue);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 15px 14px 45px;
+            border: 2px solid #e0e7ef;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-dark);
+            background: var(--white);
+            transition: all 0.3s ease;
+        }
+
+        .form-control::placeholder {
+            color: #a0aec0;
+        }
+
+        .form-control:hover {
+            border-color: var(--sky-blue);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(26, 95, 180, 0.1);
+        }
+
+        select.form-control {
+            padding-left: 15px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2362a0ea' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+        }
+
+        input[type="date"].form-control,
+        input[type="time"].form-control {
+            padding-left: 15px;
+        }
+
+        /* Submit button */
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            margin-top: 25px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--sky-blue) 100%);
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(26, 95, 180, 0.35);
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(26, 95, 180, 0.45);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .submit-btn i {
+            margin-right: 10px;
+        }
+
+        /* Success message */
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 50px;
+            color: var(--white);
+            animation: successPop 0.5s ease;
+        }
+
+        @keyframes successPop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .success-message h3 {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .success-message p {
+            color: var(--text-gray);
+            margin-bottom: 25px;
+        }
+
+        .new-booking-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            color: var(--white);
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .new-booking-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(201, 162, 39, 0.4);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            animation: fadeIn 1s ease-out 0.6s both;
+        }
+
+        .footer a {
+            color: var(--gold-light);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: var(--gold);
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .contact-item i {
+            color: var(--gold);
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: var(--white);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        .submit-btn.loading .spinner {
+            display: inline-block;
+        }
+
+        .submit-btn.loading .btn-text {
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-card {
+                padding: 30px 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .logo-text {
+                font-size: 1.8rem;
+            }
+
+            .form-title h2 {
+                font-size: 1.4rem;
+            }
+
+            .contact-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        /* Input validation styles */
+        .form-control.error {
+            border-color: #ef4444;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Admin panel styles */
+        .admin-panel {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--light-blue);
+            border-radius: 15px;
+        }
+
+        .admin-panel.show {
+            display: block;
+        }
+
+        .admin-panel h3 {
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h4 {
+            font-size: 1.8rem;
+            color: var(--primary-blue);
+        }
+
+        .stat-card p {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+        }
+
+        .view-bookings-btn {
+            background: var(--primary-blue);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .view-bookings-btn:hover {
+            background: var(--sky-blue);
+        }
+
+        .bookings-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        .booking-item {
+            background: var(--white);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .booking-item .info h4 {
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .booking-item .info p {
+            color: var(--text-gray);
+            font-size: 0.8rem;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-confirmed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-completed {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* Admin toggle button */
+        .admin-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: var(--gold);
+            border: none;
+            border-radius: 50%;
+            color: var(--white);
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .admin-toggle:hover {
+            transform: scale(1.1);
+            background: var(--primary-blue);
         }
     </style>
 </head>
-<body class="font-sans antialiased text-gray-800 h-screen overflow-y-auto flex items-center justify-center">
-
-    <div class="bg-clinic"></div>
-    <div class="fixed inset-0 bg-blue-900/30 z-[-1]"></div> <div class="container mx-auto px-4 py-10 max-w-4xl animate-fade-in-up">
-        
-        <div class="glass-panel rounded-xl shadow-2xl overflow-hidden grid md:grid-cols-3">
-            
-            <div class="bg-gradient-to-br from-clinic-blue to-blue-900 text-white p-8 md:col-span-1 flex flex-col justify-between relative overflow-hidden">
-                <div class="absolute -top-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
-                
-                <div>
-                    <div class="flex items-center gap-2 mb-8">
-                        <i class="fa-solid fa-staff-snake text-clinic-gold text-3xl"></i>
-                        <h1 class="text-2xl font-bold tracking-wide">Medi<span class="text-clinic-gold">Care</span></h1>
-                    </div>
-                    
-                    <h2 class="text-3xl font-semibold mb-4 leading-tight">Book Your <br>Appointment</h2>
-                    <p class="text-blue-100 text-sm mb-6">Experience world-class healthcare with our modern facilities. Fill out the form to schedule a consultation.</p>
-                </div>
-
-                <div class="space-y-4 text-sm">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-clinic-gold">
-                            <i class="fa-solid fa-phone"></i>
-                        </div>
-                        <span>+20 123 456 7890</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-clinic-gold">
-                            <i class="fa-solid fa-envelope"></i>
-                        </div>
-                        <span>clinic@example.com</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-clinic-gold">
-                            <i class="fa-solid fa-location-dot"></i>
-                        </div>
-                        <span>Cairo, Egypt</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="p-8 md:col-span-2 bg-white">
-                <h3 class="text-xl font-bold text-gray-800 mb-6 border-b pb-2 border-gray-100">Patient Details</h3>
-                
-                <form id="bookingForm" name="submit-to-google-sheet">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
-                        
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                            <input type="text" name="Full Name" placeholder="Ex: Ahmed Mohamed" required 
-                                class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-clinic-gold focus:ring-1 focus:ring-clinic-gold outline-none transition duration-200">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                            <input type="tel" name="Phone" placeholder="+20 123 456 7890" required 
-                                class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-clinic-gold focus:ring-1 focus:ring-clinic-gold outline-none transition duration-200">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                            <input type="email" name="Email" placeholder="email@example.com" required 
-                                class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-clinic-gold focus:ring-1 focus:ring-clinic-gold outline-none transition duration-200">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Age</label>
-                            <input type="number" name="Age" placeholder="25" min="1" max="120" required 
-                                class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-clinic-gold focus:ring-1 focus:ring-clinic-gold outline-none transition duration-200">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
-                            <div class="relative">
-                                <select name="Gender" required class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-clinic-gold focus:ring-1 focus:ring-clinic-gold outline-none appearance-none transition duration-200">
-                                    <option value="" disabled selected>Select / اختر</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                                    <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Service Needed</label>
-                            <div class="relative">
-                                <select name="Service" required class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-clinic-gold focus:ring-1 focus:ring-clinic-gold outline-none appearance-none transition duration-200">
-                                    <option value="Consultation / استشارة">Consultation / استشارة</option>
-                                    <option value="Checkup">General Checkup</option>
-                                    <option value="Dental">Dental Care</option>
-                                    <option value="Emergency">Emergency</option>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
-                                    <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Preferred Date</label>
-                            <input type="date" name="Date" required 
-                                class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-clinic-gold focus:ring-1 focus:ring-clinic-gold outline-none transition duration-200 text-gray-500">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Preferred Time</label>
-                            <input type="time" name="Time" required 
-                                class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-clinic-gold focus:ring-1 focus:ring-clinic-gold outline-none transition duration-200 text-gray-500">
-                        </div>
-                    </div>
-
-                    <button type="submit" id="submitBtn" class="w-full bg-clinic-blue hover:bg-blue-700 text-white font-bold py-4 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex justify-center items-center gap-2">
-                        <span>Confirm Booking</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </button>
-                </form>
-            </div>
-        </div>
-        
-        <p class="text-center text-white/80 mt-6 text-sm">© 2026 Modern Care Clinic. All Rights Reserved.</p>
+<body>
+    <!-- Background -->
+    <div class="background-container">
+        <div class="background-image"></div>
     </div>
 
-    <script>
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL BELOW inside the quotes
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyjKsMjlbBZHy8s9fTW7TD6Qd_36ic0z3qSNtF1tEby71-J2CEMVmYnVRvHkM8OIylZ/exec';
-        
-        const form = document.forms['submit-to-google-sheet'];
-        const btn = document.getElementById('submitBtn');
-        const btnOriginalText = btn.innerHTML;
+    <!-- Floating particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
 
-        form.addEventListener('submit', e => {
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <h1 class="logo-text">Med<span>Care</span></h1>
+            </div>
+            <p class="tagline">YOUR HEALTH, OUR PRIORITY</p>
+        </header>
+
+        <!-- Form Card -->
+        <div class="form-card">
+            <!-- Booking Form -->
+            <form id="bookingForm">
+                <div class="form-title">
+                    <h2>Book Your Appointment</h2>
+                    <p>Fill in your details and we'll confirm your booking</p>
+                    <div class="gold-line"></div>
+                </div>
+
+                <div class="form-grid">
+                    <!-- Full Name -->
+                    <div class="form-group full-width">
+                        <label for="fullName">Full Name</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="fullName" name="fullName" class="form-control" placeholder="Ex: Ahmed Mohamed" required>
+                        </div>
+                        <span class="error-message">Please enter your full name</span>
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-phone"></i>
+                            <input type="tel" id="phone" name="phone" class="form-control" placeholder="+20 123 456 7890" required>
+                        </div>
+                        <span class="error-message">Please enter a valid phone number</span>
+                    </div>
+
+                    <!-- Email Address -->
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="email" name="email" class="form-control" placeholder="email@example.com" required>
+                        </div>
+                        <span class="error-message">Please enter a valid email</span>
+                    </div>
+
+                    <!-- Age -->
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-birthday-cake"></i>
+                            <input type="number" id="age" name="age" class="form-control" placeholder="25" min="1" max="120" required>
+                        </div>
+                        <span class="error-message">Please enter your age</span>
+                    </div>
+
+                    <!-- Gender -->
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select id="gender" name="gender" class="form-control" required>
+                            <option value="">Select / اختر</option>
+                            <option value="male">Male / ذكر</option>
+                            <option value="female">Female / أنثى</option>
+                        </select>
+                        <span class="error-message">Please select your gender</span>
+                    </div>
+
+                    <!-- Service Needed -->
+                    <div class="form-group full-width">
+                        <label for="service">Service Needed</label>
+                        <select id="service" name="service" class="form-control" required>
+                            <option value="">Select a service / اختر الخدمة</option>
+                            <option value="consultation">Consultation / استشارة</option>
+                            <option value="cleaning">Cleaning / تنظيف</option>
+                            <option value="whitening">Whitening / تبييض</option>
+                            <option value="implant">Implant / زراعة</option>
+                            <option value="orthodontics">Orthodontics / تقويم</option>
+                            <option value="checkup">General Checkup / فحص عام</option>
+                            <option value="other">Other / أخرى</option>
+                        </select>
+                        <span class="error-message">Please select a service</span>
+                    </div>
+
+                    <!-- Preferred Date -->
+                    <div class="form-group">
+                        <label for="date">Preferred Date</label>
+                        <input type="date" id="date" name="date" class="form-control" required>
+                        <span class="error-message">Please select a date</span>
+                    </div>
+
+                    <!-- Preferred Time -->
+                    <div class="form-group">
+                        <label for="time">Preferred Time</label>
+                        <input type="time" id="time" name="time" class="form-control" required>
+                        <span class="error-message">Please select a time</span>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn">
+                    <span class="spinner"></span>
+                    <span class="btn-text"><i class="fas fa-calendar-check"></i> Confirm Booking</span>
+                </button>
+            </form>
+
+            <!-- Success Message -->
+            <div class="success-message" id="successMessage">
+                <div class="success-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h3>Booking Confirmed!</h3>
+                <p>Thank you for choosing MedCare Clinic. We have received your appointment request and will contact you shortly to confirm.</p>
+                <button class="new-booking-btn" onclick="resetForm()">
+                    <i class="fas fa-plus"></i> New Booking
+                </button>
+            </div>
+
+            <!-- Admin Panel (Hidden by default) -->
+            <div class="admin-panel" id="adminPanel">
+                <h3><i class="fas fa-chart-bar"></i> Dashboard</h3>
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <h4 id="totalBookings">-</h4>
+                        <p>Total Bookings</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4 id="pendingBookings">-</h4>
+                        <p>Pending</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4 id="confirmedBookings">-</h4>
+                        <p>Confirmed</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4 id="completedBookings">-</h4>
+                        <p>Completed</p>
+                    </div>
+                </div>
+                <button class="view-bookings-btn" onclick="fetchBookings()">
+                    <i class="fas fa-list"></i> View Recent Bookings
+                </button>
+                <div class="bookings-list" id="bookingsList"></div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-phone-alt"></i>
+                    <span>+20 123 456 7890</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>info@medcare-clinic.com</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>123 Medical Street, Cairo, Egypt</span>
+                </div>
+            </div>
+            <p>&copy; 2024 MedCare Clinic. All rights reserved. | <a href="#">Privacy Policy</a></p>
+        </footer>
+    </div>
+
+    <!-- Admin Toggle Button -->
+    <button class="admin-toggle" onclick="toggleAdminPanel()" title="Admin Dashboard">
+        <i class="fas fa-cog"></i>
+    </button>
+
+    <script>
+        // ============================================
+        // CONFIGURATION - REPLACE THIS WITH YOUR APPS SCRIPT URL
+        // ============================================
+        const SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
+        // Example: const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx.../exec';
+
+        // Set minimum date to today
+        const dateInput = document.getElementById('date');
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('min', today);
+
+        // Form submission
+        const form = document.getElementById('bookingForm');
+        const successMessage = document.getElementById('successMessage');
+        const submitBtn = document.querySelector('.submit-btn');
+
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // 1. Change Button to Loading State
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...';
-            btn.classList.add('opacity-75', 'cursor-not-allowed');
-
-            // 2. Prepare Data
+            // Validate form
+            if (!validateForm()) return;
+            
+            // Show loading state
+            submitBtn.classList.add('loading');
+            
+            // Get form data
             const formData = new FormData(form);
-
-            // 3. Send to Google Sheets
-            fetch(scriptURL, { method: 'POST', body: formData})
-                .then(response => {
-                    // Success!
-                    Swal.fire({
-                        title: 'Booking Confirmed!',
-                        text: 'We have received your appointment request. We will contact you shortly.',
-                        icon: 'success',
-                        confirmButtonColor: '#0056b3'
-                    });
-                    form.reset();
-                    resetButton();
-                })
-                .catch(error => {
-                    // Error
-                    console.error('Error!', error.message);
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'Something went wrong. Please check your internet connection and try again.',
-                        icon: 'error',
-                        confirmButtonColor: '#d33'
-                    });
-                    resetButton();
+            const data = Object.fromEntries(formData);
+            
+            // Check if Apps Script URL is configured
+            if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+                // Demo mode - simulate success
+                setTimeout(() => {
+                    submitBtn.classList.remove('loading');
+                    form.style.display = 'none';
+                    successMessage.classList.add('show');
+                    console.log('Demo Mode - Booking Data:', data);
+                    alert('⚠️ Demo Mode: Please configure your Google Apps Script URL in the code to save data to Google Sheets.');
+                }, 1500);
+                return;
+            }
+            
+            // Send data to Google Apps Script
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
                 });
+                
+                const result = await response.json();
+                
+                submitBtn.classList.remove('loading');
+                
+                if (result.success) {
+                    form.style.display = 'none';
+                    successMessage.classList.add('show');
+                    console.log('Booking saved successfully:', result);
+                } else {
+                    alert('Error: ' + (result.error || 'Failed to save booking'));
+                }
+            } catch (error) {
+                submitBtn.classList.remove('loading');
+                console.error('Error:', error);
+                alert('Network error. Please check your connection and try again.');
+            }
         });
 
-        function resetButton() {
-            btn.disabled = false;
-            btn.innerHTML = btnOriginalText;
-            btn.classList.remove('opacity-75', 'cursor-not-allowed');
+        // Form validation
+        function validateForm() {
+            let isValid = true;
+            const inputs = form.querySelectorAll('input, select');
+            
+            inputs.forEach(input => {
+                const errorMsg = input.parentElement.parentElement.querySelector('.error-message');
+                
+                if (!input.value.trim()) {
+                    input.classList.add('error');
+                    if (errorMsg) errorMsg.classList.add('show');
+                    isValid = false;
+                } else {
+                    // Email validation
+                    if (input.type === 'email') {
+                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        if (!emailRegex.test(input.value)) {
+                            input.classList.add('error');
+                            if (errorMsg) errorMsg.classList.add('show');
+                            isValid = false;
+                            return;
+                        }
+                    }
+                    
+                    // Phone validation
+                    if (input.type === 'tel') {
+                        const phoneRegex = /^[\+]?[\d\s\-\(\)]{10,}$/;
+                        if (!phoneRegex.test(input.value.replace(/\s/g, ''))) {
+                            input.classList.add('error');
+                            if (errorMsg) errorMsg.classList.add('show');
+                            isValid = false;
+                            return;
+                        }
+                    }
+                    
+                    input.classList.remove('error');
+                    if (errorMsg) errorMsg.classList.remove('show');
+                }
+            });
+            
+            return isValid;
         }
+
+        // Remove error on input
+        form.querySelectorAll('input, select').forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('error');
+                const errorMsg = this.parentElement.parentElement.querySelector('.error-message');
+                if (errorMsg) errorMsg.classList.remove('show');
+            });
+        });
+
+        // Reset form
+        function resetForm() {
+            form.reset();
+            form.style.display = 'block';
+            successMessage.classList.remove('show');
+            
+            // Clear all errors
+            form.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+            form.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
+        }
+
+        // ============================================
+        // ADMIN PANEL FUNCTIONS
+        // ============================================
+        
+        let adminPanelOpen = false;
+        
+        function toggleAdminPanel() {
+            const adminPanel = document.getElementById('adminPanel');
+            const form = document.getElementById('bookingForm');
+            const successMsg = document.getElementById('successMessage');
+            
+            adminPanelOpen = !adminPanelOpen;
+            
+            if (adminPanelOpen) {
+                adminPanel.classList.add('show');
+                form.style.display = 'none';
+                successMsg.classList.remove('show');
+                fetchStats();
+            } else {
+                adminPanel.classList.remove('show');
+                form.style.display = 'block';
+            }
+        }
+
+        // Fetch statistics from Google Sheet
+        async function fetchStats() {
+            if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+                document.getElementById('totalBookings').textContent = '0';
+                document.getElementById('pendingBookings').textContent = '0';
+                document.getElementById('confirmedBookings').textContent = '0';
+                document.getElementById('completedBookings').textContent = '0';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getStats`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const stats = result.stats;
+                    document.getElementById('totalBookings').textContent = stats.totalBookings;
+                    document.getElementById('pendingBookings').textContent = stats.pending;
+                    document.getElementById('confirmedBookings').textContent = stats.confirmed;
+                    document.getElementById('completedBookings').textContent = stats.completed;
+                }
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+            }
+        }
+
+        // Fetch bookings from Google Sheet
+        async function fetchBookings() {
+            const bookingsList = document.getElementById('bookingsList');
+            
+            if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+                bookingsList.innerHTML = '<p style="text-align:center;color:#666;">Please configure your Google Apps Script URL first.</p>';
+                return;
+            }
+            
+            bookingsList.innerHTML = '<p style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading...</p>';
+            
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getBookings&limit=10`);
+                const result = await response.json();
+                
+                if (result.success && result.data.length > 0) {
+                    let html = '';
+                    result.data.forEach(booking => {
+                        const status = (booking.status || 'pending').toLowerCase();
+                        const statusClass = `status-${status}`;
+                        const serviceDisplay = booking.service ? booking.service.split('/')[0].trim() : 'N/A';
+                        
+                        html += `
+                            <div class="booking-item">
+                                <div class="info">
+                                    <h4>${booking.fullname || 'N/A'}</h4>
+                                    <p>${serviceDisplay} | ${booking.date || 'N/A'} at ${booking.time || 'N/A'}</p>
+                                </div>
+                                <span class="status-badge ${statusClass}">${booking.status || 'Pending'}</span>
+                            </div>
+                        `;
+                    });
+                    bookingsList.innerHTML = html;
+                } else {
+                    bookingsList.innerHTML = '<p style="text-align:center;color:#666;">No bookings found.</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching bookings:', error);
+                bookingsList.innerHTML = '<p style="text-align:center;color:#ef4444;">Error loading bookings.</p>';
+            }
+        }
+
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Add parallax effect on mouse move
+        document.addEventListener('mousemove', (e) => {
+            const particles = document.querySelector('.particles');
+            const x = (window.innerWidth - e.pageX) / 50;
+            const y = (window.innerHeight - e.pageY) / 50;
+            particles.style.transform = `translate(${x}px, ${y}px)`;
+        });
     </script>
 </body>
 </html>
