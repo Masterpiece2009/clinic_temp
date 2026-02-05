@@ -917,62 +917,61 @@
         const submitBtn = document.querySelector('.submit-btn');
 
         form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            // Validate form
-            if (!validateForm()) return;
-            
-            // Show loading state
-            submitBtn.classList.add('loading');
-            
-            // Get form data
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData);
-            
-            // Log data for debugging
-            console.log('Form Data:', data);
-            
-            // Check if Apps Script URL is configured
-            if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE' || !SCRIPT_URL) {
-                // URL not configured - show error message
-                submitBtn.classList.remove('loading');
-                alert('⚠️ Please configure your Google Apps Script URL in the code.\n\nInstructions:\n1. Go to script.google.com\n2. Create new project and paste the Code.gs\n3. Deploy as Web App\n4. Copy the URL and paste it in the SCRIPT_URL variable');
-                return;
-            }
-            
-            // Send data to Google Apps Script
-            try {
-                console.log('Sending to:', SCRIPT_URL);
-                
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                console.log('Response status:', response.status);
-                
-                const result = await response.json();
-                console.log('Response data:', result);
-                
-                submitBtn.classList.remove('loading');
-                
-                if (result.success) {
-                    form.style.display = 'none';
-                    successMessage.classList.add('show');
-                    console.log('✅ Booking saved successfully!');
-                } else {
-                    alert('Error: ' + (result.error || 'Failed to save booking'));
+                e.preventDefault();
+
+                // 1. Validate form
+                if (!validateForm()) return;
+
+                // 2. Show loading state
+                submitBtn.classList.add('loading');
+                submitBtn.disabled = true;
+
+                // 3. Get form data
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData);
+
+                console.log('Form Data:', data);
+
+                try {
+                        console.log('Sending to:', SCRIPT_URL);
+
+                        // 4. Send data (CORS Fix: use text/plain)
+                        const response = await fetch(SCRIPT_URL, {
+                                method: 'POST',
+                                redirect: 'follow',
+                                headers: {
+                                        'Content-Type': 'text/plain;charset=utf-8',
+                                },
+                                body: JSON.stringify(data)
+                        });
+
+                        // 5. Handle Response
+                        const result = await response.json();
+                        console.log('Response data:', result);
+
+                        submitBtn.classList.remove('loading');
+                        submitBtn.disabled = false;
+
+                        if (result.success || result.result === 'success') {
+                                form.style.display = 'none';
+                                if (successMessage) {
+                                        successMessage.classList.add('show');
+                                }
+                                console.log('✅ Booking saved successfully!');
+                        } else {
+                                throw new Error(result.error || 'Failed to save booking');
+                        }
+
+                } catch (error) {
+                        submitBtn.classList.remove('loading');
+                        submitBtn.disabled = false;
+                        console.error('❌ Error:', error);
+                        alert('Error: ' + error.message);
                 }
-            } catch (error) {
-                submitBtn.classList.remove('loading');
-                console.error('❌ Error:', error);
-                alert('Network error. Please check your connection and try again.\n\nError: ' + error.message);
-            }
         });
+        
+
+
 
         // Form validation
         function validateForm() {
