@@ -651,8 +651,9 @@
             color: #1e40af;
         }
 
-        /* Admin toggle button */
+        /* Admin toggle button - HIDDEN by default */
         .admin-toggle {
+            display: none;
             position: fixed;
             bottom: 20px;
             right: 20px;
@@ -673,7 +674,25 @@
             transform: scale(1.1);
             background: var(--primary-blue);
         }
+
+        .admin-toggle.visible {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Hidden admin trigger area */
+        .admin-trigger {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 50px;
+            height: 50px;
+            cursor: default;
+            z-index: 99;
+        }
     </style>
+<base target="_blank">
 </head>
 <body>
     <!-- Background -->
@@ -865,16 +884,26 @@
         </footer>
     </div>
 
-    <!-- Admin Toggle Button -->
-    <button class="admin-toggle" onclick="toggleAdminPanel()" title="Admin Dashboard">
+    <!-- Hidden admin trigger area (triple-click to show admin button) -->
+    <div class="admin-trigger" id="adminTrigger" title="Admin access"></div>
+
+    <!-- Admin Toggle Button (Hidden by default) -->
+    <button class="admin-toggle" id="adminToggle" onclick="toggleAdminPanel()" title="Admin Dashboard">
         <i class="fas fa-cog"></i>
     </button>
 
     <script>
         // ============================================
-        // CONFIGURATION - REPLACE THIS WITH YOUR APPS SCRIPT URL
+        // IMPORTANT: REPLACE THIS WITH YOUR GOOGLE APPS SCRIPT URL
         // ============================================
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzwcUw5hIp-tftjKP_ZWnCLMSHqryGfj7Cv3sZO4Gi6ytoPcdUlm_gGpFxYDYcrCcFp/exec';
+        // To get your URL:
+        // 1. Go to https://script.google.com
+        // 2. Create new project → Paste the Code.gs code
+        // 3. Save → Deploy → New deployment → Web app
+        // 4. Set "Execute as: Me" and "Who has access: Anyone"
+        // 5. Copy the Web App URL and paste it below
+        // ============================================
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz65E6T2GvebyoEfHTtNp-lI11zhsKQxxXIjR4MnjBFrCDCoLI2QR9h6dRhCJDLZsDS/exec';
         // Example: const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx.../exec';
 
         // Set minimum date to today
@@ -900,44 +929,48 @@
             const formData = new FormData(form);
             const data = Object.fromEntries(formData);
             
+            // Log data for debugging
+            console.log('Form Data:', data);
+            
             // Check if Apps Script URL is configured
-            if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
-                // Demo mode - simulate success
-                setTimeout(() => {
-                    submitBtn.classList.remove('loading');
-                    form.style.display = 'none';
-                    successMessage.classList.add('show');
-                    console.log('Demo Mode - Booking Data:', data);
-                    alert('⚠️ Demo Mode: Please configure your Google Apps Script URL in the code to save data to Google Sheets.');
-                }, 1500);
+            if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE' || !SCRIPT_URL) {
+                // URL not configured - show error message
+                submitBtn.classList.remove('loading');
+                alert('⚠️ Please configure your Google Apps Script URL in the code.\n\nInstructions:\n1. Go to script.google.com\n2. Create new project and paste the Code.gs\n3. Deploy as Web App\n4. Copy the URL and paste it in the SCRIPT_URL variable');
                 return;
             }
             
             // Send data to Google Apps Script
             try {
+                console.log('Sending to:', SCRIPT_URL);
+                
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
+                    mode: 'cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(data)
                 });
                 
+                console.log('Response status:', response.status);
+                
                 const result = await response.json();
+                console.log('Response data:', result);
                 
                 submitBtn.classList.remove('loading');
                 
                 if (result.success) {
                     form.style.display = 'none';
                     successMessage.classList.add('show');
-                    console.log('Booking saved successfully:', result);
+                    console.log('✅ Booking saved successfully!');
                 } else {
                     alert('Error: ' + (result.error || 'Failed to save booking'));
                 }
             } catch (error) {
                 submitBtn.classList.remove('loading');
-                console.error('Error:', error);
-                alert('Network error. Please check your connection and try again.');
+                console.error('❌ Error:', error);
+                alert('Network error. Please check your connection and try again.\n\nError: ' + error.message);
             }
         });
 
@@ -947,7 +980,8 @@
             const inputs = form.querySelectorAll('input, select');
             
             inputs.forEach(input => {
-                const errorMsg = input.parentElement.parentElement.querySelector('.error-message');
+                const formGroup = input.closest('.form-group');
+                const errorMsg = formGroup ? formGroup.querySelector('.error-message') : null;
                 
                 if (!input.value.trim()) {
                     input.classList.add('error');
@@ -988,7 +1022,8 @@
         form.querySelectorAll('input, select').forEach(input => {
             input.addEventListener('input', function() {
                 this.classList.remove('error');
-                const errorMsg = this.parentElement.parentElement.querySelector('.error-message');
+                const formGroup = this.closest('.form-group');
+                const errorMsg = formGroup ? formGroup.querySelector('.error-message') : null;
                 if (errorMsg) errorMsg.classList.remove('show');
             });
         });
@@ -1005,10 +1040,43 @@
         }
 
         // ============================================
-        // ADMIN PANEL FUNCTIONS
+        // ADMIN PANEL - HIDDEN FROM REGULAR USERS
+        // ============================================
+        // To access admin panel: Triple-click the bottom-right corner
+        // or add ?admin=true to the URL
         // ============================================
         
         let adminPanelOpen = false;
+        let clickCount = 0;
+        let clickTimer = null;
+        
+        // Check if admin mode is enabled via URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const isAdminMode = urlParams.get('admin') === 'true';
+        
+        // Show admin button if in admin mode
+        if (isAdminMode) {
+            document.getElementById('adminToggle').classList.add('visible');
+        }
+        
+        // Triple-click handler for admin trigger area
+        const adminTrigger = document.getElementById('adminTrigger');
+        adminTrigger.addEventListener('click', function() {
+            clickCount++;
+            
+            if (clickCount === 1) {
+                clickTimer = setTimeout(() => {
+                    clickCount = 0;
+                }, 500);
+            }
+            
+            if (clickCount === 3) {
+                clearTimeout(clickTimer);
+                clickCount = 0;
+                document.getElementById('adminToggle').classList.add('visible');
+                alert('Admin mode activated! Click the gear icon to open dashboard.');
+            }
+        });
         
         function toggleAdminPanel() {
             const adminPanel = document.getElementById('adminPanel');
@@ -1030,7 +1098,7 @@
 
         // Fetch statistics from Google Sheet
         async function fetchStats() {
-            if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+            if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE' || !SCRIPT_URL) {
                 document.getElementById('totalBookings').textContent = '0';
                 document.getElementById('pendingBookings').textContent = '0';
                 document.getElementById('confirmedBookings').textContent = '0';
@@ -1058,7 +1126,7 @@
         async function fetchBookings() {
             const bookingsList = document.getElementById('bookingsList');
             
-            if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+            if (SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE' || !SCRIPT_URL) {
                 bookingsList.innerHTML = '<p style="text-align:center;color:#666;">Please configure your Google Apps Script URL first.</p>';
                 return;
             }
@@ -1095,17 +1163,6 @@
                 bookingsList.innerHTML = '<p style="text-align:center;color:#ef4444;">Error loading bookings.</p>';
             }
         }
-
-        // Add smooth scroll behavior
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-        });
 
         // Add parallax effect on mouse move
         document.addEventListener('mousemove', (e) => {
